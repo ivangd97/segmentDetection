@@ -83,14 +83,14 @@ private:
     bool winSelected;
     Rect imageWindow;
 
-    void updateHistograms(Mat image, ImgViewer * visor);
-
 public slots:
     void compute();
     void start_stop_capture(bool start);
     void change_color_gray(bool color);
     void selectWindow(QPointF p, int w, int h);
     void deselectWindow();
+    void loadFromFile();
+    void saveToFile();
 };
 
 

@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "QMessageBox"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -14,10 +15,6 @@ MainWindow::MainWindow(QWidget *parent) :
     grayImage.create(240,320,CV_8UC1);
     destColorImage.create(240,320,CV_8UC3);
     destGrayImage.create(240,320,CV_8UC1);
-
-    visorHistoS = new ImgViewer(260,150, (QImage *) NULL, ui->histoFrameS);
-    visorHistoD = new ImgViewer(260,150, (QImage *) NULL, ui->histoFrameD);
-
 
     visorS = new ImgViewer(&grayImage, ui->imageFrameS);
     visorD = new ImgViewer(&destGrayImage, ui->imageFrameD);
@@ -60,47 +57,12 @@ void MainWindow::compute()
     //Procesamiento
 
 
-    //Actualización de los visores
-    if(!ui->colorButton->isChecked())
-    {
-        updateHistograms(grayImage, visorHistoS);
-        updateHistograms(destGrayImage, visorHistoD);
-    }
-
     if(winSelected)
     {
         visorS->drawSquare(QPointF(imageWindow.x+imageWindow.width/2, imageWindow.y+imageWindow.height/2), imageWindow.width,imageWindow.height, Qt::green );
     }
     visorS->update();
     visorD->update();
-    visorHistoS->update();
-    visorHistoD->update();
-
-}
-
-void MainWindow::updateHistograms(Mat image, ImgViewer * visor)
-{
-    if(image.type() != CV_8UC1) return;
-
-    Mat histogram;
-    int channels[] = {0,0};
-    int histoSize = 256;
-    float grange[] = {0, 256};
-    const float * ranges[] = {grange};
-    double minH, maxH;
-
-    calcHist( &image, 1, channels, Mat(), histogram, 1, &histoSize, ranges, true, false );
-    minMaxLoc(histogram, &minH, &maxH);
-
-    float maxY = visor->getHeight();
-
-    for(int i = 0; i<256; i++)
-    {
-        float hVal = histogram.at<float>(i);
-        float minY = maxY-hVal*maxY/maxH;
-
-        visor->drawLine(QLineF(i+2, minY, i+2, maxY), Qt::red);
-    }
 
 }
 
@@ -160,3 +122,58 @@ void MainWindow::deselectWindow()
     winSelected = false;
 }
 
+void MainWindow::loadFromFile()
+{
+    disconnect(&timer,SIGNAL(timeout()),this,SLOT(compute()));
+
+    Mat image;
+    QString fileName = QFileDialog::getOpenFileName(this,tr("Open"), "/home",tr("Images (*.jpg *.png "
+                                                                                "*.jpeg *.gif);;All Files(*)"));
+    image = cv::imread(fileName.toStdString());
+
+    if (fileName.isEmpty())
+        return;
+    else {
+        QFile file(fileName);
+        if (!file.open(QIODevice::ReadOnly)) {
+            QMessageBox::information(this, tr("Unable to open file"), file.errorString());
+            return;
+        }
+        ui->captureButton->setChecked(false);
+        ui->captureButton->setText("Start capture");
+        cv::resize(image, colorImage, Size(320, 240));
+        cvtColor(colorImage, colorImage, COLOR_BGR2RGB);
+        cvtColor(colorImage, grayImage, COLOR_RGB2GRAY);
+
+        connect(&timer,SIGNAL(timeout()),this,SLOT(compute()));
+
+    }
+}
+
+void MainWindow::saveToFile()
+{
+    disconnect(&timer,SIGNAL(timeout()),this,SLOT(compute()));
+    Mat save_image;
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Image File"),
+                                                    QString(),
+                                                    tr("JPG (*.JPG) ; jpg (*.jpg); png (*.png); jpeg(*.jpeg); gif(*.gif); All Files (*)"));
+    if(ui->colorButton->isChecked())
+        cvtColor(destColorImage, save_image, COLOR_RGB2BGR);
+
+    else
+        cvtColor(destGrayImage, save_image, COLOR_GRAY2BGR);
+
+    if (fileName.isEmpty())
+        return;
+    else {
+        QFile file(fileName);
+        if (!file.open(QIODevice::WriteOnly)) {
+            QMessageBox::information(this, tr("Unable to open file"),
+                                     file.errorString());
+            return;
+        }
+    }
+    cv::imwrite(fileName.toStdString(), save_image);
+
+    connect(&timer,SIGNAL(timeout()),this,SLOT(compute()));
+}

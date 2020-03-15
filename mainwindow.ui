@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>860</width>
+    <width>899</width>
     <height>563</height>
    </rect>
   </property>
@@ -105,10 +105,10 @@
   <widget class="QFrame" name="processingFrame">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>460</y>
-     <width>831</width>
-     <height>91</height>
+     <x>10</x>
+     <y>430</y>
+     <width>211</width>
+     <height>121</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -117,91 +117,36 @@
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <widget class="QComboBox" name="operationComboBox">
+   <widget class="QLabel" name="harrisF_label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>101</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Harris Factor&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="blockSize_label">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>50</y>
-      <width>161</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <item>
-     <property name="text">
-      <string>Transform pixel</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Thresholding</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Equalize</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Gaussian Blur</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Median Blur</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Linear Filter</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Dilate</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Erode</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Apply several...</string>
-     </property>
-    </item>
-   </widget>
-   <widget class="QLabel" name="operationLabel">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>30</y>
-      <width>121</width>
+      <width>81</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Select operation&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Block size&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QLabel" name="gaussianLabel">
+   <widget class="QSpinBox" name="blockSize_box">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>30</y>
-      <width>111</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Gaussian width&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="thresholdSpinBox">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
+      <x>140</x>
       <y>50</y>
       <width>60</width>
       <height>27</height>
@@ -214,11 +159,11 @@
      <number>120</number>
     </property>
    </widget>
-   <widget class="QLabel" name="gaussianLabel_2">
+   <widget class="QLabel" name="threshold_label">
     <property name="geometry">
      <rect>
-      <x>280</x>
-      <y>30</y>
+      <x>10</x>
+      <y>90</y>
       <width>81</width>
       <height>17</height>
      </rect>
@@ -227,50 +172,11 @@
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Threshold&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="kernelButton">
+   <widget class="QSpinBox" name="harrisFactor_box">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>40</y>
-      <width>111</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Set Kernel</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="operOrderButton">
-    <property name="geometry">
-     <rect>
-      <x>660</x>
-      <y>40</y>
-      <width>161</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Set Operation Order</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pixelTButton">
-    <property name="geometry">
-     <rect>
-      <x>370</x>
-      <y>40</y>
-      <width>181</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Set Pixel Transformation</string>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="gaussWidthBox">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>50</y>
+      <x>140</x>
+      <y>10</y>
       <width>60</width>
       <height>27</height>
      </rect>
@@ -288,13 +194,29 @@
      <number>3</number>
     </property>
    </widget>
+   <widget class="QSpinBox" name="threshold_box">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>90</y>
+      <width>60</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>255</number>
+    </property>
+    <property name="value">
+     <number>120</number>
+    </property>
+   </widget>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="corners_label">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>440</y>
-     <width>221</width>
+     <x>20</x>
+     <y>390</y>
+     <width>101</width>
      <height>31</height>
     </rect>
    </property>
@@ -302,7 +224,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt; font-weight:600;&quot;&gt;Image Processing&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt; font-weight:600;&quot;&gt;Corners&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="textFormat">
     <enum>Qt::RichText</enum>
@@ -327,13 +249,13 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QFrame" name="histoFrameS">
+  <widget class="QFrame" name="processingFrame_2">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>280</y>
-     <width>260</width>
-     <height>150</height>
+     <x>230</x>
+     <y>430</y>
+     <width>211</width>
+     <height>121</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -342,17 +264,110 @@
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <property name="lineWidth">
-    <number>4</number>
+   <widget class="QLabel" name="minthreshold_label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>121</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Min. Threshold&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="maxthreshold_label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>111</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Max. Threshold&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="thresholdSpinBox_5">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>50</y>
+      <width>60</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>255</number>
+    </property>
+    <property name="value">
+     <number>120</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="gaussWidthBox_3">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>10</y>
+      <width>60</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>3</number>
+    </property>
+    <property name="maximum">
+     <number>19</number>
+    </property>
+    <property name="singleStep">
+     <number>2</number>
+    </property>
+    <property name="value">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="showCanny_checkbox">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>90</y>
+      <width>161</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Show Canny image</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QLabel" name="canny_label">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>390</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="autoFillBackground">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt; font-weight:600;&quot;&gt;Canny&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::RichText</enum>
    </property>
   </widget>
-  <widget class="QFrame" name="histoFrameD">
+  <widget class="QFrame" name="processingFrame_3">
    <property name="geometry">
     <rect>
-     <x>420</x>
-     <y>280</y>
-     <width>260</width>
-     <height>150</height>
+     <x>450</x>
+     <y>430</y>
+     <width>211</width>
+     <height>121</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -361,8 +376,245 @@
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <property name="lineWidth">
-    <number>4</number>
+   <widget class="QLabel" name="operationLabel_4">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>121</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Select operation&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="gaussianLabel_7">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>111</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Gaussian width&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="thresholdSpinBox_7">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>50</y>
+      <width>60</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>255</number>
+    </property>
+    <property name="value">
+     <number>120</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="gaussianLabel_8">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>81</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Threshold&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="gaussWidthBox_4">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>10</y>
+      <width>60</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>3</number>
+    </property>
+    <property name="maximum">
+     <number>19</number>
+    </property>
+    <property name="singleStep">
+     <number>2</number>
+    </property>
+    <property name="value">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="thresholdSpinBox_8">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>90</y>
+      <width>60</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>255</number>
+    </property>
+    <property name="value">
+     <number>120</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QLabel" name="lines_label">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>390</y>
+     <width>71</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="autoFillBackground">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt; font-weight:600;&quot;&gt;Lines&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::RichText</enum>
+   </property>
+  </widget>
+  <widget class="QFrame" name="processingFrame_4">
+   <property name="geometry">
+    <rect>
+     <x>670</x>
+     <y>430</y>
+     <width>211</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QLabel" name="operationLabel_5">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>121</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Select operation&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="gaussianLabel_9">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>111</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Gaussian width&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="thresholdSpinBox_9">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>50</y>
+      <width>60</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>255</number>
+    </property>
+    <property name="value">
+     <number>120</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="gaussianLabel_10">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>81</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Threshold&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="gaussWidthBox_5">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>10</y>
+      <width>60</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>3</number>
+    </property>
+    <property name="maximum">
+     <number>19</number>
+    </property>
+    <property name="singleStep">
+     <number>2</number>
+    </property>
+    <property name="value">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="thresholdSpinBox_10">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>90</y>
+      <width>60</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>255</number>
+    </property>
+    <property name="value">
+     <number>120</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QLabel" name="segments_label">
+   <property name="geometry">
+    <rect>
+     <x>670</x>
+     <y>390</y>
+     <width>131</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="autoFillBackground">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt; font-weight:600;&quot;&gt;Segments&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::RichText</enum>
    </property>
   </widget>
  </widget>
@@ -371,12 +623,8 @@
   <tabstop>colorButton</tabstop>
   <tabstop>loadButton</tabstop>
   <tabstop>saveButton</tabstop>
-  <tabstop>operationComboBox</tabstop>
-  <tabstop>gaussWidthBox</tabstop>
-  <tabstop>thresholdSpinBox</tabstop>
-  <tabstop>pixelTButton</tabstop>
-  <tabstop>kernelButton</tabstop>
-  <tabstop>operOrderButton</tabstop>
+  <tabstop>harrisFactor_box</tabstop>
+  <tabstop>blockSize_box</tabstop>
  </tabstops>
  <resources/>
  <connections/>
