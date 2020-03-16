@@ -18,9 +18,8 @@ HEADERS  += mainwindow.h \
 
 INCLUDEPATH += /usr/local/include/opencv4
 
+CONFIG += c++11
+
 LIBS += -L/usr/local/lib -lopencv_imgproc -lopencv_core -lopencv_highgui -lopencv_features2d -lopencv_flann -lopencv_video -lopencv_videoio -lopencv_calib3d -lopencv_imgcodecs
 
-FORMS    += mainwindow.ui \
-    operOrderForm.ui \
-    pixelTForm.ui \
-    lFilterForm.ui
+FORMS    += mainwindow.ui

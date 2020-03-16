@@ -12,9 +12,6 @@
 #include <opencv2/calib3d/calib3d.hpp>
 
 #include <imgviewer.h>
-#include <ui_pixelTForm.h>
-#include <ui_lFilterForm.h>
-#include <ui_operOrderForm.h>
 
 #include <QtWidgets/QFileDialog>
 
@@ -27,39 +24,6 @@ namespace Ui {
     class MainWindow;
 }
 
-class PixelTDialog : public QDialog, public Ui::PixelTForm
-{
-    Q_OBJECT
-
-public:
-    PixelTDialog(QDialog *parent=0) : QDialog(parent){
-        setupUi(this);
-    }
-};
-
-class LFilterDialog : public QDialog, public Ui::LFilterForm
-{
-    Q_OBJECT
-
-public:
-    LFilterDialog(QDialog *parent=0) : QDialog(parent){
-        setupUi(this);
-    }
-};
-
-
-
-class OperOrderDialog : public QDialog, public Ui::OperOrderForm
-{
-    Q_OBJECT
-
-public:
-    OperOrderDialog(QDialog *parent=0) : QDialog(parent){
-        setupUi(this);
-    }
-};
-
-
 
 
 class MainWindow : public QMainWindow
@@ -71,10 +35,9 @@ public:
     ~MainWindow();
 
 private:
+    //Interfaz principal de usuario
     Ui::MainWindow *ui;
-    PixelTDialog pixelTDialog;
-    LFilterDialog lFilterDialog;
-    OperOrderDialog operOrderDialog;
+
     QTimer timer;
 
     VideoCapture *cap;
