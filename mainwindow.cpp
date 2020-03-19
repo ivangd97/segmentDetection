@@ -26,6 +26,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(visorS,SIGNAL(windowSelected(QPointF, int, int)),this,SLOT(selectWindow(QPointF, int, int)));
     connect(visorS,SIGNAL(pressEvent()),this,SLOT(deselectWindow()));
 
+    connect(ui->loadButton,SIGNAL(pressed()),this,SLOT(loadFromFile()));
+
     timer.start(30);
 
 
