@@ -2,6 +2,14 @@
 #include "ui_mainwindow.h"
 #include "QMessageBox"
 
+/**
+ * P3 - Segment Detection
+ * Ivan González
+ * Borja Alberto Tirado Galán
+ *
+ *
+ */
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -11,10 +19,12 @@ MainWindow::MainWindow(QWidget *parent) :
     cap = new VideoCapture(0);
     winSelected = false;
 
+    //Inicializacion de imagenes
     colorImage.create(240,320,CV_8UC3);
     grayImage.create(240,320,CV_8UC1);
     destColorImage.create(240,320,CV_8UC3);
     destGrayImage.create(240,320,CV_8UC1);
+    corners.create(240,320,CV_8UC1);
 
     visorS = new ImgViewer(&grayImage, ui->imageFrameS);
     visorD = new ImgViewer(&destGrayImage, ui->imageFrameD);
@@ -27,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(visorS,SIGNAL(pressEvent()),this,SLOT(deselectWindow()));
 
     connect(ui->loadButton,SIGNAL(pressed()),this,SLOT(loadFromFile()));
+    connect(ui->showCorners_checkbox,SIGNAL(clicked()),this,SLOT(cornerDetection()));
 
     timer.start(30);
 
@@ -57,6 +68,8 @@ void MainWindow::compute()
 
 
     //Procesamiento
+    if(!cornerList.empty() && ui->showCorners_checkbox->isChecked())
+        printCorners();
 
 
     if(winSelected)
@@ -147,9 +160,14 @@ void MainWindow::loadFromFile()
         cvtColor(colorImage, colorImage, COLOR_BGR2RGB);
         cvtColor(colorImage, grayImage, COLOR_RGB2GRAY);
 
+        if(ui->colorButton->isChecked())
+            colorImage.copyTo(destColorImage);
+        else
+            grayImage.copyTo(destGrayImage);
         connect(&timer,SIGNAL(timeout()),this,SLOT(compute()));
 
     }
+
 }
 
 void MainWindow::saveToFile()
@@ -178,4 +196,42 @@ void MainWindow::saveToFile()
     cv::imwrite(fileName.toStdString(), save_image);
 
     connect(&timer,SIGNAL(timeout()),this,SLOT(compute()));
+}
+
+void MainWindow::cornerDetection()
+{
+    Mat dst, dst_norm, dst_norm_scaled;
+    cornerList.clear();
+    double harris_factor = ui->harrisFactor_box->value();
+    int blockSize = ui->blockSize_box->value();
+    float threshold = ui->threshold_box->value();
+
+    dst = Mat::zeros(grayImage.size(), CV_32FC1 );
+
+    //Metodo que calcula las esquinas
+    cv::cornerHarris(grayImage, dst, blockSize, 3, harris_factor);
+
+    //Almacenamiento de las esquinas en una lista
+    for (int x=0; x < dst.cols; x++) {
+        for (int y=0; y < dst.rows; y++) {
+            if(dst.at<float>(y,x)>threshold)
+            {
+                punto p;
+                p.point = Point(x,y);
+                p.valor = dst.at<float>(y,x);
+                this->cornerList.push_back(p);
+            }
+        }
+    }
+
+    dst.copyTo(destGrayImage);
+}
+
+void MainWindow::printCorners()
+{
+    for (int i = 0;i < (int) cornerList.size(); i++) {
+        visorD->drawEllipse(QPoint(cornerList[i].point.x, cornerList[i].point.y), 2, 2, Qt::red);
+
+    }
+
 }

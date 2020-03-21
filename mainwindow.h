@@ -16,7 +16,13 @@
 #include <QtWidgets/QFileDialog>
 
 
-
+/**
+ * P3 - Segment Detection
+ * Ivan González
+ * Borja Alberto Tirado Galán
+ *
+ *
+ */
 
 using namespace cv;
 
@@ -24,6 +30,10 @@ namespace Ui {
     class MainWindow;
 }
 
+typedef struct{
+    Point point;
+    float valor;
+} punto;
 
 
 class MainWindow : public QMainWindow
@@ -45,6 +55,13 @@ private:
     Mat colorImage, grayImage, destColorImage, destGrayImage;
     bool winSelected;
     Rect imageWindow;
+    Mat corners; //Mat de esquinas
+    /*
+     * cornerList[0] = Point
+     * cornerList[1] = Valor de Point */
+    std::vector<punto> cornerList;
+
+
 
 public slots:
     void compute();
@@ -54,6 +71,8 @@ public slots:
     void deselectWindow();
     void loadFromFile();
     void saveToFile();
+    void cornerDetection();
+    void printCorners();
 };
 
 
