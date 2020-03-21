@@ -35,6 +35,11 @@ typedef struct{
     float valor;
 } punto;
 
+struct puntoCompare {
+    bool operator()(const punto a, const punto b) const {
+        return a.valor > b.valor;
+    }
+};
 
 class MainWindow : public QMainWindow
 {

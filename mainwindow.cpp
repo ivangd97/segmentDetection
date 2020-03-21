@@ -200,8 +200,10 @@ void MainWindow::saveToFile()
 
 void MainWindow::cornerDetection()
 {
-    Mat dst, dst_norm, dst_norm_scaled;
+    Mat dst;
+    dst.create(240, 320, CV_32FC1);
     cornerList.clear();
+
     double harris_factor = ui->harrisFactor_box->value();
     int blockSize = ui->blockSize_box->value();
     float threshold = ui->threshold_box->value();
@@ -214,7 +216,7 @@ void MainWindow::cornerDetection()
     //Almacenamiento de las esquinas en una lista
     for (int x=0; x < dst.cols; x++) {
         for (int y=0; y < dst.rows; y++) {
-            if(dst.at<float>(y,x)>threshold)
+            if(dst.at<float>(y,x) > threshold)
             {
                 punto p;
                 p.point = Point(x,y);
@@ -223,6 +225,21 @@ void MainWindow::cornerDetection()
             }
         }
     }
+    //Lista ordenada de esquinas
+    std::sort(cornerList.begin(), cornerList.end(), puntoCompare());
+
+    //Supresion del no maximo
+    for(int i=0; i < (int)cornerList.size(); i++){
+        for(int j=i+1; j < (int)cornerList.size(); j++){
+            if(abs(cornerList[i].point.x - cornerList[j].point.x) < 4 &&
+                    abs(cornerList[i].point.y - cornerList[j].point.y) < 4){
+
+                cornerList.erase(cornerList.begin()+j);
+                j--;
+            }
+        }
+    }
+
 
     dst.copyTo(destGrayImage);
 }
@@ -231,7 +248,6 @@ void MainWindow::printCorners()
 {
     for (int i = 0;i < (int) cornerList.size(); i++) {
         visorD->drawEllipse(QPoint(cornerList[i].point.x, cornerList[i].point.y), 2, 2, Qt::red);
-
     }
 
 }
