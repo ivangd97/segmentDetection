@@ -231,8 +231,8 @@ void MainWindow::cornerDetection()
     //Supresion del no maximo
     for(int i=0; i < (int)cornerList.size(); i++){
         for(int j=i+1; j < (int)cornerList.size(); j++){
-            if(abs(cornerList[i].point.x - cornerList[j].point.x) < 4 &&
-                    abs(cornerList[i].point.y - cornerList[j].point.y) < 4){
+            if(abs(cornerList[i].point.x - cornerList[j].point.x) < threshold &&
+                    abs(cornerList[i].point.y - cornerList[j].point.y) < threshold){
 
                 cornerList.erase(cornerList.begin()+j);
                 j--;
