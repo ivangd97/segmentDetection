@@ -78,6 +78,7 @@ public slots:
     void saveToFile();
     void cornerDetection();
     void printCorners();
+    void edgesDetection();
 };
 
 

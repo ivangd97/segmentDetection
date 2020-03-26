@@ -38,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->loadButton,SIGNAL(pressed()),this,SLOT(loadFromFile()));
     connect(ui->showCorners_checkbox,SIGNAL(clicked()),this,SLOT(cornerDetection()));
+    connect(ui->showCanny_checkbox,SIGNAL(clicked()),this,SLOT(edgesDetection()));
 
     timer.start(30);
 
@@ -249,5 +250,26 @@ void MainWindow::printCorners()
     for (int i = 0;i < (int) cornerList.size(); i++) {
         visorD->drawEllipse(QPoint(cornerList[i].point.x, cornerList[i].point.y), 2, 2, Qt::red);
     }
+
+}
+
+void MainWindow::edgesDetection()
+{
+    Mat detected_edges;
+    int lowThreshold = ui->minthreshold_box->value();
+    int const maxThreshold = ui->maxthreshold_box->value();
+    int kernel_size = 3;
+
+    grayImage.copySize(destGrayImage);
+    // Reduce noise with a kernel 3x3
+    blur(destGrayImage, detected_edges, Size(3,3));
+
+    // Canny detector
+    cv::Canny(detected_edges, detected_edges, lowThreshold, maxThreshold, kernel_size);
+
+    // Using Canny's output as a mask, we display our result
+    destGrayImage = Scalar::all(0);
+
+    grayImage.copyTo(destGrayImage, detected_edges);
 
 }
