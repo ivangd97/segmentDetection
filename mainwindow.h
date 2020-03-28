@@ -61,11 +61,13 @@ private:
     bool winSelected;
     Rect imageWindow;
     Mat corners; //Mat de esquinas
+
     /*
      * cornerList[0] = Point
      * cornerList[1] = Valor de Point */
     std::vector<punto> cornerList;
-
+    // Vector de lineas
+    std::vector<Vec2f> lines;
 
 
 public slots:
@@ -79,6 +81,8 @@ public slots:
     void cornerDetection();
     void printCorners();
     void edgesDetection();
+    void linesDetection();
+    void printLines();
 };
 
 

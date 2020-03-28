@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->loadButton,SIGNAL(pressed()),this,SLOT(loadFromFile()));
     connect(ui->showCorners_checkbox,SIGNAL(clicked()),this,SLOT(cornerDetection()));
     connect(ui->showCanny_checkbox,SIGNAL(clicked()),this,SLOT(edgesDetection()));
+    connect(ui->showLines_checkbox,SIGNAL(clicked()),this,SLOT(linesDetection()));
 
     timer.start(30);
 
@@ -69,9 +70,17 @@ void MainWindow::compute()
 
 
     //Procesamiento
+    // Representar esquinas
     if(!cornerList.empty() && ui->showCorners_checkbox->isChecked())
         printCorners();
 
+    // Volver a la imagen original cuando se desactiva la opcion Canny
+    if(!ui->showCanny_checkbox->isChecked() && !ui->showCorners_checkbox->isChecked() && !ui->showLines_checkbox->isChecked()){
+        grayImage.copyTo(destGrayImage);
+    }
+    // Representar lineas
+    if(!lines.empty() && ui->showLines_checkbox->isChecked())
+        printLines();
 
     if(winSelected)
     {
@@ -273,3 +282,27 @@ void MainWindow::edgesDetection()
     grayImage.copyTo(destGrayImage, detected_edges);
 
 }
+
+void MainWindow::linesDetection()
+{
+    int threshold = ui->linesthreshold_box->value();
+    int rho = ui->rhoresolution_box->value();
+    float theta = ui->thetaresolution_box->value();
+
+    cv::HoughLines(destGrayImage, lines, rho, theta, threshold,0,0,0, CV_PI/180);
+}
+
+void MainWindow::printLines()
+{
+    for (int i = 0; i < (int) lines.size(); i++) {
+        Vec2f v = lines[i];
+        visorD->drawLine(QLine(v[0], v[1], v[2], v[3]), Qt::green, 2);
+    }
+
+}
+
+
+
+
+
+
