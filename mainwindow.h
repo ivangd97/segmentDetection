@@ -61,6 +61,9 @@ private:
     bool winSelected;
     Rect imageWindow;
     Mat corners; //Mat de esquinas
+    int threshold;
+    int rho;
+    float theta;
 
     /*
      * cornerList[0] = Point
@@ -68,6 +71,7 @@ private:
     std::vector<punto> cornerList;
     // Vector de lineas
     std::vector<Vec2f> lines;
+    std::vector<QPoint> qLines1, qLines2;
 
 
 public slots:

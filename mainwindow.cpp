@@ -75,7 +75,8 @@ void MainWindow::compute()
         printCorners();
 
     // Volver a la imagen original cuando se desactiva la opcion Canny
-    if(!ui->showCanny_checkbox->isChecked() && !ui->showCorners_checkbox->isChecked() && !ui->showLines_checkbox->isChecked()){
+    if((!ui->showCanny_checkbox->isChecked() && (!ui->showCorners_checkbox->isChecked() || !ui->showLines_checkbox->isChecked()))){
+
         grayImage.copyTo(destGrayImage);
     }
     // Representar lineas
@@ -285,23 +286,59 @@ void MainWindow::edgesDetection()
 
 void MainWindow::linesDetection()
 {
-    int threshold = ui->linesthreshold_box->value();
-    int rho = ui->rhoresolution_box->value();
-    float theta = ui->thetaresolution_box->value();
+    threshold = ui->linesthreshold_box->value();
+    rho = ui->rhoresolution_box->value();
+    theta = ui->thetaresolution_box->value();
 
-    cv::HoughLines(destGrayImage, lines, rho, theta, threshold,0,0,0, CV_PI/180);
-}
+    //HoughLines nos devuelve los parámetros de la linea
+    //Pero necesitamos los limites de la linea
+    cv::HoughLines(destGrayImage, lines, rho, theta, threshold, 0,0,0, CV_PI/180);
 
-void MainWindow::printLines()
-{
-    for (int i = 0; i < (int) lines.size(); i++) {
-        Vec2f v = lines[i];
-        visorD->drawLine(QLine(v[0], v[1], v[2], v[3]), Qt::green, 2);
+
+    QPoint p1, p2;
+    //Casos especiales
+    for ( size_t i = 0; i < lines.size(); i++ )     {
+        int x1 = lines[i][0];
+        int y1 = lines[i][1];
+        int x2 = lines[i][2];
+        int y2 = lines[i][3];
+
+        //TODO: Descartar los puntos fuera de rango
+
+
+        // === Casos Especiales ===
+        //calculo de la linea vertical
+        //Es decir, si sin(theta) == 0
+        if(sin(theta) == 0){
+            x1=rho / cos(theta);
+            y1=0;
+            x2=239;
+            y2=rho / cos(theta);
+        }
+        //Si la linea es horizontal
+        if(cos(theta) == 0){
+            x1=0;
+            y1=rho / sin(theta);
+            x2=319;
+            y2=rho / sin(theta);
+        }
+        p1.setX(x1);
+        p1.setY(y1);
+        p2.setX(x2);
+        p2.setY(y2);
+        qLines1.push_back(p1);
+        qLines2.push_back(p2);
+
     }
-
 }
 
 
+void MainWindow::printLines(){
+
+    for(size_t i=0;i < qLines1.size();i++)
+     visorD->drawLine(QLine(qLines1[i],qLines2[i]), Qt::green, 2);
+
+}
 
 
 
