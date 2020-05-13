@@ -291,17 +291,29 @@ void MainWindow::linesDetection()
     threshold = ui->linesthreshold_box->value();
     rho = ui->rhoresolution_box->value();
     theta = ui->thetaresolution_box->value();
+     Mat detected_lines;
+     grayImage.copySize(destGrayImage);
+     // Reduce noise with a kernel 3x3
+     blur(destGrayImage, detected_lines, Size(3,3));
     //HoughLines nos devuelve los parámetros de la linea
     //Pero necesitamos los limites de la linea
     //cv::HoughLines(destGrayImage, lines, rho, theta, threshold, 0,0,0, CV_PI/180);
 
-    QPoint p1, p2;
-    HoughLinesP( destGrayImage, lines, 1, CV_PI/180, 80, 30, 10 );
+    HoughLines( detected_lines, lines, 1, CV_PI/180, 100 );
+
     for( size_t i = 0; i < lines.size(); i++ )
     {
-        line( destGrayImage, Point(lines[i][0], lines[i][1]),
-            Point(lines[i][2], lines[i][3]), Scalar(0,0,255), 3, 8 );
+        float rho = lines[i][0];
+        float theta = lines[i][1];
+        double a = cos(theta), b = sin(theta);
+        double x0 = a*rho, y0 = b*rho;
+        Point pt1(cvRound(x0 + 1000*(-b)),
+                  cvRound(y0 + 1000*(a)));
+        Point pt2(cvRound(x0 - 1000*(-b)),
+                  cvRound(y0 - 1000*(a)));
+        line( destGrayImage, pt1, pt2, Scalar(0,0,255), 3, 8 );
     }
+    grayImage.copyTo(destGrayImage, detected_lines);
     //Casos especiales
     /*for ( size_t i = 0; i < lines.size(); i++ )     {
         int x1 = lines[i][0];
