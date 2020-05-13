@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "QMessageBox"
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
 
 /**
  * P3 - Segment Detection
@@ -289,15 +291,19 @@ void MainWindow::linesDetection()
     threshold = ui->linesthreshold_box->value();
     rho = ui->rhoresolution_box->value();
     theta = ui->thetaresolution_box->value();
-
     //HoughLines nos devuelve los parámetros de la linea
     //Pero necesitamos los limites de la linea
-    cv::HoughLines(destGrayImage, lines, rho, theta, threshold, 0,0,0, CV_PI/180);
-
+    //cv::HoughLines(destGrayImage, lines, rho, theta, threshold, 0,0,0, CV_PI/180);
 
     QPoint p1, p2;
+    HoughLinesP( grayImage, lines, 1, CV_PI/180, 80, 30, 10 );
+    for( size_t i = 0; i < lines.size(); i++ )
+    {
+        line( destGrayImage, Point(lines[i][0], lines[i][1]),
+            Point(lines[i][2], lines[i][3]), Scalar(0,0,255), 3, 8 );
+    }
     //Casos especiales
-    for ( size_t i = 0; i < lines.size(); i++ )     {
+    /*for ( size_t i = 0; i < lines.size(); i++ )     {
         int x1 = lines[i][0];
         int y1 = lines[i][1];
         int x2 = lines[i][2];
@@ -305,15 +311,14 @@ void MainWindow::linesDetection()
 
         //TODO: Descartar los puntos fuera de rango
 
-
         // === Casos Especiales ===
         //calculo de la linea vertical
         //Es decir, si sin(theta) == 0
         if(sin(theta) == 0){
             x1=rho / cos(theta);
             y1=0;
-            x2=239;
-            y2=rho / cos(theta);
+            x2=rho / cos(theta);
+            y2=239;
         }
         //Si la linea es horizontal
         if(cos(theta) == 0){
@@ -329,7 +334,7 @@ void MainWindow::linesDetection()
         qLines1.push_back(p1);
         qLines2.push_back(p2);
 
-    }
+    }*/
 }
 
 

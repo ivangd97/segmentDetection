@@ -70,7 +70,7 @@ private:
      * cornerList[1] = Valor de Point */
     std::vector<punto> cornerList;
     // Vector de lineas
-    std::vector<Vec2f> lines;
+    std::vector<Vec4i> lines;
     std::vector<QPoint> qLines1, qLines2;
 
 
