@@ -12,9 +12,8 @@
  *
  */
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
+                                          ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
@@ -22,30 +21,28 @@ MainWindow::MainWindow(QWidget *parent) :
     winSelected = false;
 
     //Inicializacion de imagenes
-    colorImage.create(240,320,CV_8UC3);
-    grayImage.create(240,320,CV_8UC1);
-    destColorImage.create(240,320,CV_8UC3);
-    destGrayImage.create(240,320,CV_8UC1);
-    corners.create(240,320,CV_8UC1);
+    colorImage.create(240, 320, CV_8UC3);
+    grayImage.create(240, 320, CV_8UC1);
+    destColorImage.create(240, 320, CV_8UC3);
+    destGrayImage.create(240, 320, CV_8UC1);
+    corners.create(240, 320, CV_8UC1);
 
     visorS = new ImgViewer(&grayImage, ui->imageFrameS);
     visorD = new ImgViewer(&destGrayImage, ui->imageFrameD);
 
+    connect(&timer, SIGNAL(timeout()), this, SLOT(compute()));
+    connect(ui->captureButton, SIGNAL(clicked(bool)), this, SLOT(start_stop_capture(bool)));
+    connect(ui->colorButton, SIGNAL(clicked(bool)), this, SLOT(change_color_gray(bool)));
+    connect(visorS, SIGNAL(windowSelected(QPointF, int, int)), this, SLOT(selectWindow(QPointF, int, int)));
+    connect(visorS, SIGNAL(pressEvent()), this, SLOT(deselectWindow()));
 
-    connect(&timer,SIGNAL(timeout()),this,SLOT(compute()));
-    connect(ui->captureButton,SIGNAL(clicked(bool)),this,SLOT(start_stop_capture(bool)));
-    connect(ui->colorButton,SIGNAL(clicked(bool)),this,SLOT(change_color_gray(bool)));
-    connect(visorS,SIGNAL(windowSelected(QPointF, int, int)),this,SLOT(selectWindow(QPointF, int, int)));
-    connect(visorS,SIGNAL(pressEvent()),this,SLOT(deselectWindow()));
-
-    connect(ui->loadButton,SIGNAL(pressed()),this,SLOT(loadFromFile()));
-    connect(ui->showCorners_checkbox,SIGNAL(clicked()),this,SLOT(cornerDetection()));
-    connect(ui->showCanny_checkbox,SIGNAL(clicked()),this,SLOT(edgesDetection()));
-    connect(ui->showLines_checkbox,SIGNAL(clicked()),this,SLOT(linesDetection()));
+    connect(ui->loadButton, SIGNAL(pressed()), this, SLOT(loadFromFile()));
+    connect(ui->showCorners_checkbox, SIGNAL(clicked()), this, SLOT(cornerDetection()));
+    connect(ui->showCanny_checkbox, SIGNAL(clicked()), this, SLOT(edgesDetection()));
+    connect(ui->showLines_checkbox, SIGNAL(clicked()), this, SLOT(linesDetection()));
+    connect(ui->showSegments_checkbox, SIGNAL(clicked()), this, SLOT(segmentDetection()));
 
     timer.start(30);
-
-
 }
 
 MainWindow::~MainWindow()
@@ -60,44 +57,41 @@ void MainWindow::compute()
 {
     //Captura de imagen
 
-    if(ui->captureButton->isChecked() && cap->isOpened())
+    if (ui->captureButton->isChecked() && cap->isOpened())
     {
         *cap >> colorImage;
 
         cv::resize(colorImage, colorImage, Size(320, 240));
         cvtColor(colorImage, grayImage, COLOR_BGR2GRAY);
         cvtColor(colorImage, colorImage, COLOR_BGR2RGB);
-
     }
 
-
-    //Procesamiento
+    // ________________Procesamiento__________________
     // Representar esquinas
-    if(!cornerList.empty() && ui->showCorners_checkbox->isChecked())
+    if (!cornerList.empty() && ui->showCorners_checkbox->isChecked())
         printCorners();
 
-    // Volver a la imagen original cuando se desactiva la opcion Canny
-    if((!ui->showCanny_checkbox->isChecked() && (!ui->showCorners_checkbox->isChecked() || !ui->showLines_checkbox->isChecked()))){
-
-        grayImage.copyTo(destGrayImage);
-    }
     // Representar lineas
-    if(!lines.empty() && ui->showLines_checkbox->isChecked())
+    if (!lineList.empty() && ui->showLines_checkbox->isChecked())
         printLines();
 
-    if(winSelected)
+    // Volver a la imagen original cuando se desactiva la opcion Canny
+    if (!ui->showCanny_checkbox->isChecked())
     {
-        visorS->drawSquare(QPointF(imageWindow.x+imageWindow.width/2, imageWindow.y+imageWindow.height/2), imageWindow.width,imageWindow.height, Qt::green );
+        grayImage.copyTo(destGrayImage);
+    }
+
+    if (winSelected)
+    {
+        visorS->drawSquare(QPointF(imageWindow.x + imageWindow.width / 2, imageWindow.y + imageWindow.height / 2), imageWindow.width, imageWindow.height, Qt::green);
     }
     visorS->update();
     visorD->update();
-
 }
-
 
 void MainWindow::start_stop_capture(bool start)
 {
-    if(start)
+    if (start)
         ui->captureButton->setText("Stop capture");
     else
         ui->captureButton->setText("Start capture");
@@ -105,41 +99,39 @@ void MainWindow::start_stop_capture(bool start)
 
 void MainWindow::change_color_gray(bool color)
 {
-    if(color)
+    if (color)
     {
         ui->colorButton->setText("Gray image");
         visorS->setImage(&colorImage);
         visorD->setImage(&destColorImage);
-
     }
     else
     {
         ui->colorButton->setText("Color image");
         visorS->setImage(&grayImage);
         visorD->setImage(&destGrayImage);
-
     }
 }
 
 void MainWindow::selectWindow(QPointF p, int w, int h)
 {
     QPointF pEnd;
-    if(w>0 && h>0)
+    if (w > 0 && h > 0)
     {
-        imageWindow.x = p.x()-w/2;
-        if(imageWindow.x<0)
+        imageWindow.x = p.x() - w / 2;
+        if (imageWindow.x < 0)
             imageWindow.x = 0;
-        imageWindow.y = p.y()-h/2;
-        if(imageWindow.y<0)
+        imageWindow.y = p.y() - h / 2;
+        if (imageWindow.y < 0)
             imageWindow.y = 0;
-        pEnd.setX(p.x()+w/2);
-        if(pEnd.x()>=320)
+        pEnd.setX(p.x() + w / 2);
+        if (pEnd.x() >= 320)
             pEnd.setX(319);
-        pEnd.setY(p.y()+h/2);
-        if(pEnd.y()>=240)
+        pEnd.setY(p.y() + h / 2);
+        if (pEnd.y() >= 240)
             pEnd.setY(239);
-        imageWindow.width = pEnd.x()-imageWindow.x;
-        imageWindow.height = pEnd.y()-imageWindow.y;
+        imageWindow.width = pEnd.x() - imageWindow.x;
+        imageWindow.height = pEnd.y() - imageWindow.y;
 
         winSelected = true;
     }
@@ -152,18 +144,20 @@ void MainWindow::deselectWindow()
 
 void MainWindow::loadFromFile()
 {
-    disconnect(&timer,SIGNAL(timeout()),this,SLOT(compute()));
+    disconnect(&timer, SIGNAL(timeout()), this, SLOT(compute()));
 
     Mat image;
-    QString fileName = QFileDialog::getOpenFileName(this,tr("Open"), "/home",tr("Images (*.jpg *.png "
-                                                                                "*.jpeg *.gif);;All Files(*)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open"), "/home", tr("Images (*.jpg *.png "
+                                                                                  "*.jpeg *.gif);;All Files(*)"));
     image = cv::imread(fileName.toStdString());
 
     if (fileName.isEmpty())
         return;
-    else {
+    else
+    {
         QFile file(fileName);
-        if (!file.open(QIODevice::ReadOnly)) {
+        if (!file.open(QIODevice::ReadOnly))
+        {
             QMessageBox::information(this, tr("Unable to open file"), file.errorString());
             return;
         }
@@ -173,24 +167,22 @@ void MainWindow::loadFromFile()
         cvtColor(colorImage, colorImage, COLOR_BGR2RGB);
         cvtColor(colorImage, grayImage, COLOR_RGB2GRAY);
 
-        if(ui->colorButton->isChecked())
+        if (ui->colorButton->isChecked())
             colorImage.copyTo(destColorImage);
         else
             grayImage.copyTo(destGrayImage);
-        connect(&timer,SIGNAL(timeout()),this,SLOT(compute()));
-
+        connect(&timer, SIGNAL(timeout()), this, SLOT(compute()));
     }
-
 }
 
 void MainWindow::saveToFile()
 {
-    disconnect(&timer,SIGNAL(timeout()),this,SLOT(compute()));
+    disconnect(&timer, SIGNAL(timeout()), this, SLOT(compute()));
     Mat save_image;
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Image File"),
                                                     QString(),
                                                     tr("JPG (*.JPG) ; jpg (*.jpg); png (*.png); jpeg(*.jpeg); gif(*.gif); All Files (*)"));
-    if(ui->colorButton->isChecked())
+    if (ui->colorButton->isChecked())
         cvtColor(destColorImage, save_image, COLOR_RGB2BGR);
 
     else
@@ -198,9 +190,11 @@ void MainWindow::saveToFile()
 
     if (fileName.isEmpty())
         return;
-    else {
+    else
+    {
         QFile file(fileName);
-        if (!file.open(QIODevice::WriteOnly)) {
+        if (!file.open(QIODevice::WriteOnly))
+        {
             QMessageBox::information(this, tr("Unable to open file"),
                                      file.errorString());
             return;
@@ -208,7 +202,7 @@ void MainWindow::saveToFile()
     }
     cv::imwrite(fileName.toStdString(), save_image);
 
-    connect(&timer,SIGNAL(timeout()),this,SLOT(compute()));
+    connect(&timer, SIGNAL(timeout()), this, SLOT(compute()));
 }
 
 void MainWindow::cornerDetection()
@@ -221,19 +215,21 @@ void MainWindow::cornerDetection()
     int blockSize = ui->blockSize_box->value();
     float threshold = ui->threshold_box->value();
 
-    dst = Mat::zeros(grayImage.size(), CV_32FC1 );
+    dst = Mat::zeros(grayImage.size(), CV_32FC1);
 
     //Metodo que calcula las esquinas
     cv::cornerHarris(grayImage, dst, blockSize, 3, harris_factor);
 
     //Almacenamiento de las esquinas en una lista
-    for (int x=0; x < dst.cols; x++) {
-        for (int y=0; y < dst.rows; y++) {
-            if(dst.at<float>(y,x) > threshold)
+    for (int x = 0; x < dst.cols; x++)
+    {
+        for (int y = 0; y < dst.rows; y++)
+        {
+            if (dst.at<float>(y, x) > threshold)
             {
                 punto p;
-                p.point = Point(x,y);
-                p.valor = dst.at<float>(y,x);
+                p.point = Point(x, y);
+                p.valor = dst.at<float>(y, x);
                 this->cornerList.push_back(p);
             }
         }
@@ -242,27 +238,29 @@ void MainWindow::cornerDetection()
     std::sort(cornerList.begin(), cornerList.end(), puntoCompare());
 
     //Supresion del no maximo
-    for(int i=0; i < (int)cornerList.size(); i++){
-        for(int j=i+1; j < (int)cornerList.size(); j++){
-            if(abs(cornerList[i].point.x - cornerList[j].point.x) < threshold &&
-                    abs(cornerList[i].point.y - cornerList[j].point.y) < threshold){
+    for (int i = 0; i < (int)cornerList.size(); i++)
+    {
+        for (int j = i + 1; j < (int)cornerList.size(); j++)
+        {
+            if (abs(cornerList[i].point.x - cornerList[j].point.x) < threshold &&
+                abs(cornerList[i].point.y - cornerList[j].point.y) < threshold)
+            {
 
-                cornerList.erase(cornerList.begin()+j);
+                cornerList.erase(cornerList.begin() + j);
                 j--;
             }
         }
     }
-
 
     dst.copyTo(destGrayImage);
 }
 
 void MainWindow::printCorners()
 {
-    for (int i = 0;i < (int) cornerList.size(); i++) {
+    for (size_t i = 0; i < cornerList.size(); i++)
+    {
         visorD->drawEllipse(QPoint(cornerList[i].point.x, cornerList[i].point.y), 2, 2, Qt::red);
     }
-
 }
 
 void MainWindow::edgesDetection()
@@ -274,7 +272,7 @@ void MainWindow::edgesDetection()
 
     grayImage.copySize(destGrayImage);
     // Reduce noise with a kernel 3x3
-    blur(destGrayImage, detected_edges, Size(3,3));
+    blur(destGrayImage, detected_edges, Size(3, 3));
 
     // Canny detector
     cv::Canny(detected_edges, detected_edges, lowThreshold, maxThreshold, kernel_size);
@@ -283,7 +281,6 @@ void MainWindow::edgesDetection()
     destGrayImage = Scalar::all(0);
 
     grayImage.copyTo(destGrayImage, detected_edges);
-
 }
 
 void MainWindow::linesDetection()
@@ -291,72 +288,63 @@ void MainWindow::linesDetection()
     threshold = ui->linesthreshold_box->value();
     rho = ui->rhoresolution_box->value();
     theta = ui->thetaresolution_box->value();
-     Mat detected_lines;
-     grayImage.copySize(destGrayImage);
-     // Reduce noise with a kernel 3x3
-     blur(destGrayImage, detected_lines, Size(3,3));
-    //HoughLines nos devuelve los parámetros de la linea
-    //Pero necesitamos los limites de la linea
-    //cv::HoughLines(destGrayImage, lines, rho, theta, threshold, 0,0,0, CV_PI/180);
+    pCorte.clear();
+    lineList.clear();
+    std::vector<Point>::iterator it;
+    std::vector<Vec2f> lines;
 
-    HoughLines( detected_lines, lines, 1, CV_PI/180, 100 );
+    cv::HoughLines(destGrayImage, lines, rho, theta, threshold, 0, 0, 0, CV_PI / 180);
 
-    for( size_t i = 0; i < lines.size(); i++ )
+    for (size_t i = 0; i < lines.size(); i++)
     {
         float rho = lines[i][0];
         float theta = lines[i][1];
-        double a = cos(theta), b = sin(theta);
-        double x0 = a*rho, y0 = b*rho;
-        Point pt1(cvRound(x0 + 1000*(-b)),
-                  cvRound(y0 + 1000*(a)));
-        Point pt2(cvRound(x0 - 1000*(-b)),
-                  cvRound(y0 - 1000*(a)));
-        line( destGrayImage, pt1, pt2, Scalar(0,0,255), 3, 8 );
+        Point pt1, pt2;
+
+        pt1.x = 0;
+        pt1.y = (int)rint(rho / sin(theta));
+        if (pt1.x >= 0 && pt1.x < 320)
+        {
+            it = std::find(pCorte.begin(), pCorte.end(), pt1);
+            if (it != pCorte.end())
+                pCorte.push_back(pt1);
+        }
+        pt1.x = (int)rint(rho / cos(theta));
+        pt1.y = 0;
+        if (pt1.y >= 0 && pt1.y < 240)
+        {
+            it = std::find(pCorte.begin(), pCorte.end(), pt1);
+            if (it != pCorte.end())
+                pCorte.push_back(pt1);
+        }
+
+        pt2.x = 319;
+        pt2.y = (int)rint(rho / sin(theta));
+        if (pt2.x >= 0 && pt2.x < 320)
+        {
+            it = std::find(pCorte.begin(), pCorte.end(), pt2);
+            if (it != pCorte.end())
+                pCorte.push_back(pt2);
+        }
+        pt2.x = (int)rint(rho / cos(theta));
+        pt2.y = 239;
+        if (pt2.y >= 0 && pt2.y < 240)
+        {
+            it = std::find(pCorte.begin(), pCorte.end(), pt2);
+            if (it != pCorte.end())
+                pCorte.push_back(pt2);
+        }
+
+        this->lineList.push_back(QLine(QPoint(pt1.x, pt1.y), QPoint(pt2.x, pt2.y)));
     }
-    grayImage.copyTo(destGrayImage, detected_lines);
-    //Casos especiales
-    /*for ( size_t i = 0; i < lines.size(); i++ )     {
-        int x1 = lines[i][0];
-        int y1 = lines[i][1];
-        int x2 = lines[i][2];
-        int y2 = lines[i][3];
-
-        //TODO: Descartar los puntos fuera de rango
-
-        // === Casos Especiales ===
-        //calculo de la linea vertical
-        //Es decir, si sin(theta) == 0
-        if(sin(theta) == 0){
-            x1=rho / cos(theta);
-            y1=0;
-            x2=rho / cos(theta);
-            y2=239;
-        }
-        //Si la linea es horizontal
-        if(cos(theta) == 0){
-            x1=0;
-            y1=rho / sin(theta);
-            x2=319;
-            y2=rho / sin(theta);
-        }
-        p1.setX(x1);
-        p1.setY(y1);
-        p2.setX(x2);
-        p2.setY(y2);
-        qLines1.push_back(p1);
-        qLines2.push_back(p2);
-
-    }*/
 }
 
-
-void MainWindow::printLines(){
-
-    for(size_t i=0;i < qLines1.size();i++)
-     visorD->drawLine(QLine(qLines1[i],qLines2[i]), Qt::green, 2);
-
+void MainWindow::segmentDetection()
+{
 }
 
-
-
-
+void MainWindow::printLines()
+{
+    for (size_t i = 0; i < lineList.size(); i++)
+        visorD->drawLine(lineList[i], Qt::green, 3);
+}

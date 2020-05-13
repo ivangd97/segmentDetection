@@ -70,8 +70,10 @@ private:
      * cornerList[1] = Valor de Point */
     std::vector<punto> cornerList;
     // Vector de lineas
-    std::vector<Vec2f> lines;
-    std::vector<QPoint> qLines1, qLines2;
+    std::vector<QLine> lineList;
+    // Vector de puntos validos
+    std::vector<Point> pCorte;
+
 
 
 public slots:
@@ -82,10 +84,11 @@ public slots:
     void deselectWindow();
     void loadFromFile();
     void saveToFile();
-    void cornerDetection();
     void printCorners();
+    void cornerDetection();
     void edgesDetection();
     void linesDetection();
+    void segmentDetection();
     void printLines();
 };
 
