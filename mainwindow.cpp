@@ -296,7 +296,7 @@ void MainWindow::linesDetection()
     //cv::HoughLines(destGrayImage, lines, rho, theta, threshold, 0,0,0, CV_PI/180);
 
     QPoint p1, p2;
-    HoughLinesP( grayImage, lines, 1, CV_PI/180, 80, 30, 10 );
+    HoughLinesP( destGrayImage, lines, 1, CV_PI/180, 80, 30, 10 );
     for( size_t i = 0; i < lines.size(); i++ )
     {
         line( destGrayImage, Point(lines[i][0], lines[i][1]),
