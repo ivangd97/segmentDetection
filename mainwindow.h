@@ -61,6 +61,8 @@ private:
     bool winSelected;
     Rect imageWindow;
     Mat corners; //Mat de esquinas
+    Mat canny_image; //Mat de canny
+    Mat detected_edges;
     int threshold;
     int rho;
     float theta;
