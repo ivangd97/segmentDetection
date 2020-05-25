@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     connect(ui->showCorners_checkbox, SIGNAL(clicked()), this, SLOT(cornerDetection()));
     connect(ui->showCanny_checkbox, SIGNAL(clicked()), this, SLOT(edgesDetection()));
     connect(ui->showLines_checkbox, SIGNAL(clicked()), this, SLOT(linesDetection()));
-    connect(ui->showSegments_checkbox, SIGNAL(clicked()), this, SLOT(segmentDetection()));
+    connect(ui->showSegments_checkbox, SIGNAL(clicked()), this, SLOT(segmentDetection(int)));
 
     timer.start(30);
 }
@@ -363,8 +363,55 @@ void MainWindow::linesDetection()
 
 }
 
-void MainWindow::segmentDetection()
+void MainWindow::segmentDetection(int w)
 {
+    int numCorners = 0;
+    int numPoints = 0;
+    int x1, x2, y1, y2;
+    for(size_t i = 0; i < lineList.size(); i++){
+        if(lineList[i].p1().y() < lineList[i].p2().y()){
+            x1 =lineList[i].p1().x();
+            y1 =lineList[i].p1().y();
+            x2 =lineList[i].p2().x();
+            y2 =lineList[i].p2().y();
+        }
+        else{
+            x2 =lineList[i].p1().x();
+            y2 =lineList[i].p1().y();
+            x1 =lineList[i].p2().x();
+            y1 =lineList[i].p2().y();
+        }
+        for(int y = y1; y < y2; y++){
+            int x = (y - y1)*(x2 - x1)/(y2 - y1) + x1;
+            bool borderFound = false;
+            for(int xAux = x - w/2; xAux < x + w/2; xAux++){
+                if(xAux >= 0 && xAux < 320){
+                    if(cornerList[xAux, y] == 1){
+                        numCorners++;
+                        if(numCorners == 1){
+                            e1 = (xAux, y);
+                            numPoints = 0;
+                        }
+                        else{
+                            e2 = (xAux, y);
+                        }
+                    }
+                    if(borderFound == false && bordes[xAux, y] == 255){
+                        numPoints++;
+                        borderFound = true;
+                    }
+                }
+            }
+            if(numCorners == 2){
+                if(numPoints/(e2.y - e1.y) > p){
+                    this->segmentList.push_back(segmento(e1,e1));
+                }
+                e1 = e2;
+                numCorners = 1;
+                numPoints = 0;
+            }
+        }
+    }
 }
 
 void MainWindow::printLines()
