@@ -8,7 +8,7 @@
  * P3 - Segment Detection
  * Ivan González
  * Borja Alberto Tirado Galán
- *
+ * 26 Mayo 2020
  *
  */
 
@@ -252,8 +252,8 @@ void MainWindow::cornerDetection()
     {
         for (int j = i + 1; j < (int)cornerList.size(); j++)
         {
-            if (abs(cornerList[i].point.x - cornerList[j].point.x) < threshold &&
-                abs(cornerList[i].point.y - cornerList[j].point.y) < threshold)
+            if (abs(cornerList[i].point.x - cornerList[j].point.x) < 5 &&
+                abs(cornerList[i].point.y - cornerList[j].point.y) < 5)
             {
 
                 cornerList.erase(cornerList.begin() + j);
@@ -262,6 +262,9 @@ void MainWindow::cornerDetection()
         }
     }
 
+    for (size_t i = 0 ;i < cornerList.size();i++) {
+        corners.at<uchar>(cornerList[i].point.y, cornerList[i].point.x) = 1;
+    }
     dst.copyTo(destGrayImage);
 }
 
@@ -273,9 +276,6 @@ void MainWindow::printCorners()
     }
 }
 
-// PILAR (14/05)[DONE]: necesitáis otra imagen para almacenar el resultado de Canny.
-// PILAR (14/05): destGrayImage debe contener la imagen visible para el destino.
-// PILAR (14/05)[DONE]: detected_edges debería ser atributo de clase
 void MainWindow::edgesDetection()
 {
     int lowThreshold = ui->minthreshold_box->value();
@@ -290,7 +290,6 @@ void MainWindow::edgesDetection()
     cv::Canny(detected_edges, canny_image, lowThreshold, maxThreshold, kernel_size);
 
 
-    //PILAR (14/05)[DONE]: no estiendo porqué hacéis esta parte. El resultado (detección de bordes de Canny) debe estar en detected_edges (definida como atributo de la clase)
     // Using Canny's output as a mask, we display our result
     destGrayImage = Scalar::all(0);
 
@@ -299,7 +298,6 @@ void MainWindow::edgesDetection()
 
 void MainWindow::linesDetection()
 {
-    // PILAR (14/05)[DONE]: Deberían ser variables locales. rho y theta tienen que tener otro nombre
     int threshold_param = ui->linesthreshold_box->value();
     float rho_param  = ui->rhoresolution_box->value();
     float theta_param = ui->thetaresolution_box->value();
@@ -309,22 +307,20 @@ void MainWindow::linesDetection()
     std::vector<Vec2f> lines;
 
 
-    //PILAR (14/05): incluyo aquí la detección de bordes porque HoughLines tiene como entrada una imagen de bordes
     int lowThreshold = ui->minthreshold_box->value();
     int maxThreshold = ui->maxthreshold_box->value();
     cv::Canny(grayImage, detected_edges, lowThreshold, maxThreshold);
 
-    //PILAR (14/05)[DONE]: no debe hacerse sobre destGrayImage, sino sobre una imagen de bordes
     cv::HoughLines(detected_edges, lines, rho_param, theta_param, threshold_param);
 
-    lineList.clear(); // PILAR (14/05)[DONE]: hay que generar la lista de nuevo en cada llamada
+    lineList.clear();
     for (size_t i = 0; i < lines.size(); i++)
     {
         float rho = lines[i][0];
         float theta = lines[i][1];
         Point pt1, pt2;
 
-        pCorte.clear(); //PILAR (14/05)[DONE]: hay que generarla para cada línea
+        pCorte.clear();
 
         pt1.x = 0;
         pt1.y = (int)rint(rho / sin(theta));
@@ -360,7 +356,6 @@ void MainWindow::linesDetection()
                 pCorte.push_back(pt2);
         }
 
-        // PILAR (14/05)[DONE]: los 2 puntos que definen la línea son los dos puntos almacenados en pCorte
         if(pCorte.size()==2)
             this->lineList.push_back(QLine(QPoint(pCorte[0].x, pCorte[0].y), QPoint(pCorte[1].x, pCorte[1].y)));
     }
@@ -380,21 +375,26 @@ void MainWindow::segmentDetection()
     int x1, x2, y1, y2;
     Point e1, e2;
     int w = ui->stripewidth_box->value();
-    int p = ui->pointratio_box->value();
+    float p = ui->pointratio_box->value();
+    segmentList.clear();
+    
     for(size_t i = 0; i < lineList.size(); i++){
-        if(lineList[i].p1().y() < lineList[i].p2().y()){
-            x1 =lineList[i].p1().x();
-            y1 =lineList[i].p1().y();
-            x2 =lineList[i].p2().x();
-            y2 =lineList[i].p2().y();
-        }
-        else{
-            x2 =lineList[i].p1().x();
-            y2 =lineList[i].p1().y();
-            x1 =lineList[i].p2().x();
-            y1 =lineList[i].p2().y();
-        }
-        if((y2 - y1) > (x2 - x1)){
+        numCorners = 0;
+        numPoints = 0;
+        if(abs(y2 - y1) > abs(x2 - x1)){
+            if(lineList[i].p1().y() < lineList[i].p2().y()){
+                x1 =lineList[i].p1().x();
+                y1 =lineList[i].p1().y();
+                x2 =lineList[i].p2().x();
+                y2 =lineList[i].p2().y();
+            }
+            else{
+                x2 =lineList[i].p1().x();
+                y2 =lineList[i].p1().y();
+                x1 =lineList[i].p2().x();
+                y1 =lineList[i].p2().y();
+            }
+
             for(int y = y1; y < y2; y++){
                 int x = (y - y1)*(x2 - x1)/(y2 - y1) + x1;
                 bool borderFound = false;
@@ -402,6 +402,7 @@ void MainWindow::segmentDetection()
                     if(xAux >= 0 && xAux < 320){
                         if(corners.at<uchar>(y, xAux) == 1){
                             numCorners++;
+                             qDebug()<<"SD: incrementamos NUMCORNERS-if "<<numCorners;
                             if(numCorners == 1){
                                 e1.x = xAux;
                                 e1.y = y;
@@ -412,14 +413,16 @@ void MainWindow::segmentDetection()
                                 e2.y = y;
                             }
                         }
-                        if(borderFound == false && canny_image.at<uchar>(y,xAux) == 255){
+                        if(borderFound == false && detected_edges.at<uchar>(y,xAux) == 255){
                             numPoints++;
                             borderFound = true;
                         }
                     }
                 }
                 if(numCorners == 2){
-                    if(numPoints/(e2.y - e1.y) > p){
+                    qDebug()<<"VERTICAL"<<(float)numPoints/(e2.y - e1.y);
+                    if((float)numPoints/(e2.y - e1.y) > p){
+                        qDebug()<<"SD: INSERTAMOS UN SEGMENTO if";
                         this->segmentList.push_back(QLine(QPoint(e1.x, e1.y),QPoint(e2.x, e2.y)));
                     }
                     e1 = e2;
@@ -429,13 +432,27 @@ void MainWindow::segmentDetection()
             }
         }
         else{
+            if(lineList[i].p1().x() < lineList[i].p2().x()){
+                x1 =lineList[i].p1().x();
+                y1 =lineList[i].p1().y();
+                x2 =lineList[i].p2().x();
+                y2 =lineList[i].p2().y();
+            }
+            else{
+                x2 =lineList[i].p1().x();
+                y2 =lineList[i].p1().y();
+                x1 =lineList[i].p2().x();
+                y1 =lineList[i].p2().y();
+            }
+
             for(int x = x1; x < x2; x++){
                 int y = (x - x1)*(y2 - y1)/(x2 - x1) + y1;
                 bool borderFound = false;
                 for(int yAux = y - w/2; yAux < y + w/2; yAux++){
-                    if(yAux >= 0 && yAux < 320){
+                    if(yAux >= 0 && yAux < 240){
                         if(corners.at<uchar>(yAux, x) == 1){
                             numCorners++;
+                            qDebug()<<"SD: incrementamos NUMCORNERS-else"<<numCorners;
                             if(numCorners == 1){
                                 e1.x = x;
                                 e1.y = yAux;
@@ -446,14 +463,15 @@ void MainWindow::segmentDetection()
                                 e2.y = yAux;
                             }
                         }
-                        if(borderFound == false && canny_image.at<uchar>(yAux,x) == 255){
+                        if(borderFound == false && detected_edges.at<uchar>(yAux,x) == 255){
                             numPoints++;
                             borderFound = true;
                         }
                     }
                 }
                 if(numCorners == 2){
-                    if(numPoints/(e2.x - e1.x) > p){
+                    qDebug()<<"HORIZONTAL"<<(float)numPoints/(e2.x - e1.x);
+                    if((float)numPoints/(e2.x - e1.x) > p){
                         this->segmentList.push_back(QLine(QPoint(e1.x, e1.y),QPoint(e2.x, e2.y)));
                     }
                     e1 = e2;
@@ -463,10 +481,11 @@ void MainWindow::segmentDetection()
             }
         }
     }
+    qDebug()<<"SD: segmentList.size="<<segmentList.size();
 }
 
 void MainWindow::printSegments()
 {
     for (size_t i = 0; i < segmentList.size(); i++)
-        visorD->drawLine(segmentList[i], Qt::blue, 3);
+        visorD->drawLine(segmentList[i], Qt::red, 3);
 }

@@ -20,7 +20,7 @@
  * P3 - Segment Detection
  * Ivan González
  * Borja Alberto Tirado Galán
- *
+ * 26 Mayo 2020
  *
  */
 
@@ -75,7 +75,7 @@ private:
     std::vector<QLine> lineList;
     // Vector de puntos validos
     std::vector<Point> pCorte;
-
+    //Vector de segmentos
     std::vector<QLine> segmentList;
 
 
