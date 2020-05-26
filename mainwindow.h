@@ -94,6 +94,7 @@ public slots:
     void linesDetection();
     void segmentDetection();
     void printLines();
+    void printSegments();
 };
 
 

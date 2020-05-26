@@ -81,6 +81,10 @@ void MainWindow::compute()
     if (!lineList.empty() && ui->showLines_checkbox->isChecked())
         printLines();
 
+    // Representar segmentos
+    if (!segmentList.empty() && ui->showSegments_checkbox->isChecked())
+        printSegments();
+
     // Volver a la imagen original cuando se desactiva la opcion Canny
     if (!ui->showCanny_checkbox->isChecked())
     {
@@ -310,7 +314,7 @@ void MainWindow::linesDetection()
     int maxThreshold = ui->maxthreshold_box->value();
     cv::Canny(grayImage, detected_edges, lowThreshold, maxThreshold);
 
-    //PILAR (14/05)[DONE]: no debe hacerse sobre destGrayImahe, sino sobre una imagen de bordes
+    //PILAR (14/05)[DONE]: no debe hacerse sobre destGrayImage, sino sobre una imagen de bordes
     cv::HoughLines(detected_edges, lines, rho_param, theta_param, threshold_param);
 
     lineList.clear(); // PILAR (14/05)[DONE]: hay que generar la lista de nuevo en cada llamada
@@ -361,6 +365,12 @@ void MainWindow::linesDetection()
             this->lineList.push_back(QLine(QPoint(pCorte[0].x, pCorte[0].y), QPoint(pCorte[1].x, pCorte[1].y)));
     }
 
+}
+
+void MainWindow::printLines()
+{
+    for (size_t i = 0; i < lineList.size(); i++)
+        visorD->drawLine(lineList[i], Qt::green, 3);
 }
 
 void MainWindow::segmentDetection()
@@ -455,8 +465,8 @@ void MainWindow::segmentDetection()
     }
 }
 
-void MainWindow::printLines()
+void MainWindow::printSegments()
 {
-    for (size_t i = 0; i < lineList.size(); i++)
-        visorD->drawLine(lineList[i], Qt::green, 3);
+    for (size_t i = 0; i < segmentList.size(); i++)
+        visorD->drawLine(segmentList[i], Qt::blue, 3);
 }
