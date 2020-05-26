@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     connect(ui->showCorners_checkbox, SIGNAL(clicked()), this, SLOT(cornerDetection()));
     connect(ui->showCanny_checkbox, SIGNAL(clicked()), this, SLOT(edgesDetection()));
     connect(ui->showLines_checkbox, SIGNAL(clicked()), this, SLOT(linesDetection()));
-    connect(ui->showSegments_checkbox, SIGNAL(clicked()), this, SLOT(segmentDetection(int)));
+    connect(ui->showSegments_checkbox, SIGNAL(clicked()), this, SLOT(segmentDetection()));
 
     timer.start(30);
 }
@@ -363,11 +363,14 @@ void MainWindow::linesDetection()
 
 }
 
-void MainWindow::segmentDetection(int w)
+void MainWindow::segmentDetection()
 {
     int numCorners = 0;
     int numPoints = 0;
     int x1, x2, y1, y2;
+    Point e1, e2;
+    int w = ui->stripewidth_box->value();
+    int p = ui->pointratio_box->value();
     for(size_t i = 0; i < lineList.size(); i++){
         if(lineList[i].p1().y() < lineList[i].p2().y()){
             x1 =lineList[i].p1().x();
@@ -381,34 +384,72 @@ void MainWindow::segmentDetection(int w)
             x1 =lineList[i].p2().x();
             y1 =lineList[i].p2().y();
         }
-        for(int y = y1; y < y2; y++){
-            int x = (y - y1)*(x2 - x1)/(y2 - y1) + x1;
-            bool borderFound = false;
-            for(int xAux = x - w/2; xAux < x + w/2; xAux++){
-                if(xAux >= 0 && xAux < 320){
-                    if(cornerList[xAux, y] == 1){
-                        numCorners++;
-                        if(numCorners == 1){
-                            e1 = (xAux, y);
-                            numPoints = 0;
+        if((y2 - y1) > (x2 - x1)){
+            for(int y = y1; y < y2; y++){
+                int x = (y - y1)*(x2 - x1)/(y2 - y1) + x1;
+                bool borderFound = false;
+                for(int xAux = x - w/2; xAux < x + w/2; xAux++){
+                    if(xAux >= 0 && xAux < 320){
+                        if(corners.at<uchar>(y, xAux) == 1){
+                            numCorners++;
+                            if(numCorners == 1){
+                                e1.x = xAux;
+                                e1.y = y;
+                                numPoints = 0;
+                            }
+                            else{
+                                e2.x = xAux;
+                                e2.y = y;
+                            }
                         }
-                        else{
-                            e2 = (xAux, y);
+                        if(borderFound == false && canny_image.at<uchar>(y,xAux) == 255){
+                            numPoints++;
+                            borderFound = true;
                         }
                     }
-                    if(borderFound == false && bordes[xAux, y] == 255){
-                        numPoints++;
-                        borderFound = true;
+                }
+                if(numCorners == 2){
+                    if(numPoints/(e2.y - e1.y) > p){
+                        this->segmentList.push_back(QLine(QPoint(e1.x, e1.y),QPoint(e2.x, e2.y)));
                     }
+                    e1 = e2;
+                    numCorners = 1;
+                    numPoints = 0;
                 }
             }
-            if(numCorners == 2){
-                if(numPoints/(e2.y - e1.y) > p){
-                    this->segmentList.push_back(segmento(e1,e1));
+        }
+        else{
+            for(int x = x1; x < x2; x++){
+                int y = (x - x1)*(y2 - y1)/(x2 - x1) + y1;
+                bool borderFound = false;
+                for(int yAux = y - w/2; yAux < y + w/2; yAux++){
+                    if(yAux >= 0 && yAux < 320){
+                        if(corners.at<uchar>(yAux, x) == 1){
+                            numCorners++;
+                            if(numCorners == 1){
+                                e1.x = x;
+                                e1.y = yAux;
+                                numPoints = 0;
+                            }
+                            else{
+                                e2.x = x;
+                                e2.y = yAux;
+                            }
+                        }
+                        if(borderFound == false && canny_image.at<uchar>(yAux,x) == 255){
+                            numPoints++;
+                            borderFound = true;
+                        }
+                    }
                 }
-                e1 = e2;
-                numCorners = 1;
-                numPoints = 0;
+                if(numCorners == 2){
+                    if(numPoints/(e2.x - e1.x) > p){
+                        this->segmentList.push_back(QLine(QPoint(e1.x, e1.y),QPoint(e2.x, e2.y)));
+                    }
+                    e1 = e2;
+                    numCorners = 1;
+                    numPoints = 0;
+                }
             }
         }
     }

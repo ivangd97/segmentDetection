@@ -76,6 +76,8 @@ private:
     // Vector de puntos validos
     std::vector<Point> pCorte;
 
+    std::vector<QLine> segmentList;
+
 
 
 public slots:
